@@ -1,0 +1,23 @@
+[package]
+name = "sqlx-database-tester-macros"
+version = "0.1.0"
+authors = []
+edition = "2018"
+resolver = "2"
+
+[lib]
+proc-macro = true
+
+[features]
+runtime-actix = []
+runtime-tokio = []
+
+[dependencies]
+quote = "1.0.9"
+syn = { version = "^1", features = ["full"] }
+darling = "0.13.0"
+proc-macro2 = "1.0.28"
+
+[dev-dependencies]
+sqlx = { version = "0.5.5", features = ["runtime-tokio-rustls", "postgres"] }
+sqlx-database-tester = { version = "0.1.0", path = "..", features = ["runtime-tokio"] }
