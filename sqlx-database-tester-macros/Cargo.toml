@@ -1,8 +1,10 @@
 [package]
 name = "sqlx-database-tester-macros"
 version = "0.1.0"
-authors = []
+authors = ["Kateřina Churanová <crates@churanova.eu>"]
 edition = "2018"
+description = "Macros for sqlx-database-tester"
+license = "AGPL-3.0"
 resolver = "2"
 
 [lib]

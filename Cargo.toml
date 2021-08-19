@@ -1,8 +1,10 @@
 [package]
 name = "sqlx-database-tester"
 version = "0.1.0"
-authors = []
+authors = ["Kateřina Churanová <crates@churanova.eu>"]
 edition = "2018"
+description = "Library for creation of unit / integration tests with sqlx database support"
+license = "AGPL-3.0"
 resolver = "2"
 
 [features]
