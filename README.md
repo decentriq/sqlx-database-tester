@@ -1,19 +1,56 @@
-# Project Name
+# SQLX Database tester
 
 [![pipeline status][badge-pipeline-img]][badge-pipeline-url]
 [![coverage report][badge-coverage-img]][badge-coverage-url]
 [![docs main][badge-docs-main-img]][badge-docs-main-url]
 
-[badge-pipeline-img]: https://gitlab.com/famedly/company/backend/templates/service-template/badges/main/pipeline.svg
-[badge-pipeline-url]: https://gitlab.com/famedly/company/backend/templates/service-template/-/commits/main
-[badge-coverage-img]: https://gitlab.com/famedly/company/backend/templates/service-template/badges/main/coverage.svg
-[badge-coverage-url]: https://gitlab.com/famedly/company/backend/templates/service-template/-/commits/main
+[badge-pipeline-img]: https://gitlab.com/famedly/company/backend/libraries/sqlx-database-tester/badges/main/pipeline.svg
+[badge-pipeline-url]: https://gitlab.com/famedly/company/backend/libraries/sqlx-database-tester/-/commits/main
+[badge-coverage-img]: https://gitlab.com/famedly/company/backend/libraries/sqlx-database-tester/badges/main/coverage.svg
+[badge-coverage-url]: https://gitlab.com/famedly/company/backend/libraries/sqlx-database-tester/-/commits/main
 [badge-docs-main-img]: https://img.shields.io/badge/docs-main-blue
-[badge-docs-main-url]: https://famedly.gitlab.io/company/backend/templates/service-template/project_name/index.html
+[badge-docs-main-url]: https://famedly.gitlab.io/company/backend/libraries/sqlx-database-tester/sqlx-database-tester/index.html
 
-Short description of the project.
+This library makes it possible to create rust test cases for unit / integration testing with database access to unique databases per test case.
 
----
+Each database is created with the database name generated as UUID v4, to prevent any collision between test cases.
+
+The sqlx database pool variable of requested name is exposed to the test function scope.
+
+The macro allows for creation and exposure of multiple databases per test function if needed.
+
+## Usage:
+- For the database connection itself, set up the env variable `DATABASE_URL` with a proper postgresql connection URI. If `.env` exists, it will be used through the `dotenv` crate. (the database name in URI is ignored, even if it's specified).
+- Make sure that the user that connects to the database has permissions to create new databases.
+- You must specify one of features for this crate, `runtime-actix` or `runtime-tokio` for use of respective runtimes
+
+```rust
+#[sqlx_database_tester::test(
+    pool(variable = "default_migrated_pool"),
+    pool(variable = "migrated_pool", migrations = "./test_migrations"),
+    pool(variable = "empty_db_pool", skip_migrations),
+)]
+async fn test_server_start() {
+    let migrated_pool_tables = sqlx::query!("SELECT * FROM pg_catalog.pg_tables")
+        .fetch_all(&migrated_pool)
+        .await
+        .unwrap();
+    let empty_pool_tables = sqlx::query!("SELECT * FROM pg_catalog.pg_tables")
+        .fetch_all(&migrated_pool)
+        .await
+        .unwrap();
+    println!("Migrated pool tables: \n {:#?}", migrated_pool_tables);
+    println!("Empty pool tables: \n {:#?}", empty_pool_tables);
+}
+```
+
+## Macro attributes:
+
+- `variable`: Variable of the PgPool to be exposed to the function scope
+- `migrations`: Path to SQLX migrations directory for the specified pool
+- `skip_migrations`: If present, doesn't run any migrations
+
+----------------------------------------------------------------------
 
 # Famedly
 

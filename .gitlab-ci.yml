@@ -11,6 +11,13 @@ stages:
 
 cargo-check:
   extends: .cargo_check
+  services:
+    - name: postgres
+      alias: dbhost
+  variables:
+    POSTGRES_PASSWORD: mysecretpassword
+    DATABASE_URL: "postgresql://postgres:mysecretpassword@dbhost"
+    SQLX_OFFLINE: "true"
   # Optional, remove if not needed
   script:
     - bash tests/setup.sh
