@@ -48,8 +48,10 @@ pub(crate) struct MacroArgs {
 /// ## Macro attributes:
 ///
 /// - `variable`: Variable of the PgPool to be exposed to the function scope
+///   (mandatory)
 /// - `other_dir_migrations`: Path to SQLX other_dir_migrations directory for
-///   the specified pool
+///   the specified pool (falls back to default ./migrations directory if left
+///   out)
 /// - `skip_migrations`: If present, doesn't run any other_dir_migrations
 /// ```
 /// #[sqlx_database_tester::test(
@@ -122,7 +124,10 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 			#(#database_name_vars)*
 			#runtime.block_on(async {
 				#[allow(clippy::expect_used)]
-				let db_pool = sqlx::PgPool::connect(&sqlx_database_tester::get_database_uri()).await.expect("connecting to db for creation");
+				let db_pool = sqlx::PgPool::connect(
+					&sqlx_database_tester::get_target_database_uri(
+						&sqlx_database_tester::get_database_uri(), "").expect("URI parsing")
+					).await.expect("connecting to db for creation");				
 				#(#database_creators)*
 			});
 
@@ -137,7 +142,10 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 
 			#runtime.block_on(async {
 				#[allow(clippy::expect_used)]
-				let db_pool = sqlx::PgPool::connect(&sqlx_database_tester::get_database_uri()).await.expect("connecting to db for creation");
+				let db_pool = sqlx::PgPool::connect(
+					&sqlx_database_tester::get_target_database_uri(
+						&sqlx_database_tester::get_database_uri(), "").expect("URI parsing")
+					).await.expect("connecting to db for deletion");
 				#(#database_destructors)*
 			});
 
