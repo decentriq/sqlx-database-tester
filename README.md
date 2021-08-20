@@ -9,7 +9,7 @@
 [badge-coverage-img]: https://gitlab.com/famedly/company/backend/libraries/sqlx-database-tester/badges/main/coverage.svg
 [badge-coverage-url]: https://gitlab.com/famedly/company/backend/libraries/sqlx-database-tester/-/commits/main
 [badge-docs-main-img]: https://img.shields.io/badge/docs-main-blue
-[badge-docs-main-url]: https://famedly.gitlab.io/company/backend/libraries/sqlx-database-tester/sqlx-database-tester/index.html
+[badge-docs-main-url]: https://famedly.gitlab.io/company/backend/libraries/sqlx-database-tester/sqlx_database_tester/index.html
 
 This library makes it possible to create rust test cases for unit / integration testing with database access to unique databases per test case.
 
