@@ -20,7 +20,8 @@ The sqlx database pool variable of requested name is exposed to the test functio
 The macro allows for creation and exposure of multiple databases per test function if needed.
 
 ## Usage:
-- For the database connection itself, set up the env variable `DATABASE_URL` with a proper postgresql connection URI. If `.env` exists, it will be used through the `dotenv` crate. (the database name in URI is ignored, even if it's specified).
+- For the database connection itself, set up the env variable `DATABASE_URL` with a proper postgresql connection URI.
+  If `.env` exists, it will be used through the `dotenv` crate. (if it contains the database name, it will be used for a temporary database name prefix in form of `<PFX>_<UUID>`).
 - Make sure that the user that connects to the database has permissions to create new databases.
 - You must specify one of features for this crate, `runtime-actix` or `runtime-tokio` for use of respective runtimes
 
@@ -46,8 +47,8 @@ async fn test_server_start() {
 
 ## Macro attributes:
 
-- `variable`: Variable of the PgPool to be exposed to the function scope
-- `migrations`: Path to SQLX migrations directory for the specified pool
+- `variable`: Variable of the PgPool to be exposed to the function scope (mandatory)
+- `migrations`: Path to SQLX migrations directory for the specified pool (falls back to default ./migrations directory if left out)
 - `skip_migrations`: If present, doesn't run any migrations
 
 ----------------------------------------------------------------------

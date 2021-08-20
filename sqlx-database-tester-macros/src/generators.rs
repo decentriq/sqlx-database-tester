@@ -89,7 +89,9 @@ pub(crate) fn database_name_vars(
 	test_attr.pool.iter().map(|pool| {
 		let database_name = pool.database_name_var();
 		quote! {
-			let #database_name = sqlx_database_tester::Uuid::new_v4().to_simple().to_string();
+			#[allow(clippy::expect_used)]
+			let #database_name = sqlx_database_tester::derive_db_name(
+				&sqlx_database_tester::get_database_uri()).expect("Getting database name");
 		}
 	})
 }
