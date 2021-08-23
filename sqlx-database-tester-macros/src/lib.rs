@@ -20,7 +20,10 @@ mod generators;
 #[derive(Debug, FromMeta)]
 pub(crate) struct Pool {
 	/// The variable with pool that will be exposed to the test function
-	variable: String,
+	variable: Ident,
+	/// The optional transaction variable
+	#[darling(default)]
+	transaction_variable: Option<Ident>,
 	/// The migration directory path
 	#[darling(default)]
 	migrations: Option<String>,
@@ -57,7 +60,9 @@ pub(crate) struct MacroArgs {
 /// #[sqlx_database_tester::test(
 ///     pool(variable = "default_migrated_pool"),
 ///     pool(variable = "migrated_pool", migrations = "./other_dir_migrations"),
-///     pool(variable = "empty_db_pool", skip_migrations)
+///     pool(variable = "empty_db_pool",
+///          transaction_variable = "empty_db_transaction",
+///          skip_migrations),
 /// )]
 /// async fn test_server_sta_rt() {
 ///     let migrated_pool_tables = sqlx::query!("SELECT * FROM pg_catalog.pg_tables")
