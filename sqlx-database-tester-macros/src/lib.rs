@@ -126,7 +126,8 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 				#[allow(clippy::expect_used)]
 				let db_pool = sqlx::PgPool::connect(
 					&sqlx_database_tester::get_target_database_uri(
-						&sqlx_database_tester::get_database_uri(), "").expect("URI parsing")
+						&sqlx_database_tester::get_database_uri(), sqlx_database_tester::derive_db_prefix(
+							&sqlx_database_tester::get_database_uri()).expect("Getting database name").as_deref().unwrap_or_default()).expect("URI parsing")
 					).await.expect("connecting to db for creation");				
 				#(#database_creators)*
 			});
@@ -144,7 +145,8 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 				#[allow(clippy::expect_used)]
 				let db_pool = sqlx::PgPool::connect(
 					&sqlx_database_tester::get_target_database_uri(
-						&sqlx_database_tester::get_database_uri(), "").expect("URI parsing")
+						&sqlx_database_tester::get_database_uri(), sqlx_database_tester::derive_db_prefix(
+							&sqlx_database_tester::get_database_uri()).expect("Getting database name").as_deref().unwrap_or_default()).expect("URI parsing")
 					).await.expect("connecting to db for deletion");
 				#(#database_destructors)*
 			});
