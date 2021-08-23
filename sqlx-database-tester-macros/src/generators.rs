@@ -33,13 +33,19 @@ pub(crate) fn runtime() -> Option<TokenStream> {
 	}
 }
 
-fn pool_variable_clone_ident(name: &str) -> Ident {
+fn pool_variable_clone_ident(name: &Ident) -> Ident {
 	format_ident!("__{}", name)
 }
 pub(crate) fn database_closers(test_attr: &MacroArgs) -> Map<Iter<Pool>, fn(&Pool) -> TokenStream> {
-	test_attr.pool.iter().map(|Pool { variable, .. }| {
+	test_attr.pool.iter().map(|Pool { variable, transaction_variable, .. }| {
 		let pool_variable_ident = pool_variable_clone_ident(variable);
+		let transaction_closer = transaction_variable.as_ref().map(|t| {
+			quote! {
+			#[allow(clippy::expect_used)]
+			#t.commit().await.expect("Committing the transaction");}
+		});
 		quote! {
+			#transaction_closer
 			#pool_variable_ident.close().await;
 		}
 	})
@@ -49,11 +55,10 @@ pub(crate) fn database_migrations_exposures(
 	test_attr: &MacroArgs,
 ) -> Map<Iter<Pool>, fn(&Pool) -> TokenStream> {
 	test_attr.pool.iter().map(|pool| {
-		let variable = &pool.variable;
+		let pool_variable_ident = &pool.variable;
 		let migrations = &pool.migrations;
 		let database_name = pool.database_name_var();
-		let pool_variable_ident = format_ident!("{}", variable);
-		let pool_variable_clone_id = pool_variable_clone_ident(variable);
+		let pool_variable_clone_id = pool_variable_clone_ident(pool_variable_ident);
 		let mut result = quote! {
 			#[allow(clippy::expect_used)]
 			let #pool_variable_ident = sqlx::PgPool::connect(&sqlx_database_tester::get_target_database_uri(&sqlx_database_tester::get_database_uri(), &#database_name).expect("Can't construct the target database URI")).await.expect("connecting to db");
@@ -64,6 +69,12 @@ pub(crate) fn database_migrations_exposures(
 				#[allow(clippy::expect_used)]
 				sqlx::migrate!(#migrations).run(&#pool_variable_ident).await.expect("Migrating");
 			});
+		}
+		if let Some(transaction_variable) = &pool.transaction_variable {
+			result.extend(quote! {
+				#[allow(clippy::expect_used)]
+				let mut #transaction_variable = #pool_variable_ident.begin().await.expect("Acquiring transaction");
+			})
 		}
 		result
 	})

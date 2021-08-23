@@ -29,7 +29,9 @@ The macro allows for creation and exposure of multiple databases per test functi
 #[sqlx_database_tester::test(
     pool(variable = "default_migrated_pool"),
     pool(variable = "migrated_pool", migrations = "./test_migrations"),
-    pool(variable = "empty_db_pool", skip_migrations),
+    pool(variable = "empty_db_pool", 
+         transaction_variable = "empty_db_transaction", 
+         skip_migrations),
 )]
 async fn test_server_start() {
     let migrated_pool_tables = sqlx::query!("SELECT * FROM pg_catalog.pg_tables")
@@ -48,9 +50,9 @@ async fn test_server_start() {
 ## Macro attributes:
 
 - `variable`: Variable of the PgPool to be exposed to the function scope (mandatory)
+- `transaction_variable`: If present, starts a new transaction and exposes variable of this name to the function scope
 - `migrations`: Path to SQLX migrations directory for the specified pool (falls back to default ./migrations directory if left out)
 - `skip_migrations`: If present, doesn't run any migrations
-
 ----------------------------------------------------------------------
 
 # Famedly

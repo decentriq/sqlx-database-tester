@@ -1,4 +1,4 @@
-use sqlx::PgPool;
+use sqlx::{PgPool, Postgres, Transaction};
 
 #[sqlx_database_tester::test(
 	pool(variable = "migrated_pool", migrations = "./other_dir_migrations"),
@@ -15,6 +15,12 @@ async fn test_migrations() {
 	assert!(!nonexistant_fox.is_ok());
 }
 
+#[sqlx_database_tester::test(pool(variable = "pool", transaction_variable = "transaction"))]
+async fn test_transaction() -> std::io::Result<()> {
+	run_transaction_query(&mut transaction).await;
+	Ok(())
+}
+
 #[sqlx_database_tester::test(pool(variable = "empty_pool", skip_migrations))]
 async fn test_case_returning() -> std::io::Result<()> {
 	Ok(())
@@ -26,3 +32,8 @@ async fn test_pool_ownership_passed() {
 }
 
 fn take_pool(_: PgPool) {}
+
+async fn run_transaction_query(transaction: &mut Transaction<'_, Postgres>) {
+	let bat = sqlx::query("SELECT * FROM bat").fetch_all(transaction).await;
+	assert!(bat.is_ok());
+}
