@@ -39,7 +39,7 @@ async fn test_server_start() {
         .await
         .unwrap();
     let empty_pool_tables = sqlx::query!("SELECT * FROM pg_catalog.pg_tables")
-        .fetch_all(&migrated_pool)
+        .fetch_all(&empty_db_pool)
         .await
         .unwrap();
     println!("Migrated pool tables: \n {:#?}", migrated_pool_tables);
