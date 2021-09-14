@@ -1,6 +1,6 @@
 [package]
 name = "sqlx-database-tester"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Kateřina Churanová <crates@churanova.eu>"]
 edition = "2018"
 description = "Library for creation of unit / integration tests with sqlx database support"
@@ -13,7 +13,7 @@ runtime-tokio = ["sqlx-database-tester-macros/runtime-tokio"]
 
 [dependencies]
 http = "0.2.4"
-sqlx-database-tester-macros = { version = "0.1.0", path = "./sqlx-database-tester-macros" }
+sqlx-database-tester-macros = { version = "0.2.0", path = "./sqlx-database-tester-macros" }
 uuid = { version = "0.8.1", features = ["v4"] }
 dotenv = "0.15.0"
 
