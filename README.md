@@ -53,6 +53,13 @@ async fn test_server_start() {
 - `transaction_variable`: If present, starts a new transaction and exposes variable of this name to the function scope
 - `migrations`: Path to SQLX migrations directory for the specified pool (falls back to default ./migrations directory if left out)
 - `skip_migrations`: If present, doesn't run any migrations
+
+## Pre-commit usage
+
+1. If not installed, install with your package manager, or `pip install --user pre-commit`
+2. Run `pre-commit autoupdate` to update the pre-commit config to use the newest template
+3. Run `pre-commit install` to install the pre-commit hooks to your local environment
+
 ----------------------------------------------------------------------
 
 # Famedly
