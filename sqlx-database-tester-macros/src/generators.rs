@@ -51,17 +51,16 @@ pub(crate) fn database_closers(test_attr: &MacroArgs) -> Map<Iter<Pool>, fn(&Poo
 	})
 }
 
-pub(crate) fn database_migrations_exposures(
-	test_attr: &MacroArgs,
-) -> Map<Iter<Pool>, fn(&Pool) -> TokenStream> {
-	test_attr.pool.iter().map(|pool| {
+pub(crate) fn database_migrations_exposures(test_attr: &MacroArgs) -> Vec<TokenStream> {
+	let level = test_attr.level.as_str();
+	let res: Vec<_> = test_attr.pool.iter().map(|pool| {
 		let pool_variable_ident = &pool.variable;
 		let migrations = &pool.migrations;
 		let database_name = pool.database_name_var();
 		let pool_variable_clone_id = pool_variable_clone_ident(pool_variable_ident);
 		let mut result = quote! {
 			#[allow(clippy::expect_used)]
-			let #pool_variable_ident = sqlx::PgPool::connect(&sqlx_database_tester::get_target_database_uri(&sqlx_database_tester::get_database_uri(), &#database_name).expect("Can't construct the target database URI")).await.expect("connecting to db");
+			let #pool_variable_ident = sqlx::PgPool::connect_with(sqlx_database_tester::connect_options(&#database_name, #level)).await.expect("connecting to db");
 			let #pool_variable_clone_id = #pool_variable_ident.clone();
 		};
 		if !pool.skip_migrations {
@@ -77,7 +76,9 @@ pub(crate) fn database_migrations_exposures(
 			})
 		}
 		result
-	})
+	}).collect();
+
+	res
 }
 
 pub(crate) fn database_creators(

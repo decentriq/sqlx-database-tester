@@ -37,3 +37,9 @@ async fn run_transaction_query(transaction: &mut Transaction<'_, Postgres>) {
 	let bat = sqlx::query("SELECT * FROM bat").fetch_all(transaction).await;
 	assert!(bat.is_ok());
 }
+
+#[cfg(feature = "sqlx-log")]
+#[sqlx_database_tester::test(level = "Trace", pool(variable = "pool"))]
+async fn log_set() {
+	take_pool(pool);
+}

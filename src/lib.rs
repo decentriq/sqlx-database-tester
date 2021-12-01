@@ -41,6 +41,26 @@ pub fn derive_db_name(uri: &str) -> http::Result<String> {
 	})
 }
 
+/// Creates a `PgConnectOptions`
+pub fn connect_options(
+	database_name: &str,
+	#[allow(unused_variables)] level: &str,
+) -> sqlx::postgres::PgConnectOptions {
+	#[allow(unused_imports)]
+	use sqlx::ConnectOptions;
+	#[allow(clippy::expect_used, unused_mut)]
+	let mut options = sqlx::postgres::PgConnectOptions::from_str(
+		&get_target_database_uri(&get_database_uri(), database_name)
+			.expect("Can't construct the target database URI"),
+	)
+	.expect("Failed to parse database URI");
+	#[cfg(feature = "sqlx-log")]
+	if let Ok(filter) = log::LevelFilter::from_str(level) {
+		options.log_statements(filter);
+	}
+	options
+}
+
 #[doc(hidden)]
 /// Retrieve the database uri for a specific database
 pub fn get_target_database_uri(uri: &str, db_name: &str) -> http::Result<String> {
