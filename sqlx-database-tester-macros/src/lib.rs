@@ -41,6 +41,9 @@ impl Pool {
 /// Test case configuration
 #[derive(Debug, FromMeta)]
 pub(crate) struct MacroArgs {
+	/// Sqlx log level
+	#[darling(default)]
+	level: String,
 	/// The variable the database pool will be exposed in
 	#[darling(multiple)]
 	pool: Vec<Pool>,
@@ -88,6 +91,7 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 		}
 	};
 
+	let level = test_attr.level.as_str();
 	let attrs = &input.attrs;
 	let vis = &input.vis;
 	let sig = &mut input.sig;
@@ -129,11 +133,12 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 			#(#database_name_vars)*
 			#runtime.block_on(async {
 				#[allow(clippy::expect_used)]
-				let db_pool = sqlx::PgPool::connect(
-					&sqlx_database_tester::get_target_database_uri(
-						&sqlx_database_tester::get_database_uri(), sqlx_database_tester::derive_db_prefix(
-							&sqlx_database_tester::get_database_uri()).expect("Getting database name").as_deref().unwrap_or_default()).expect("URI parsing")
-					).await.expect("connecting to db for creation");				
+				let db_pool = sqlx::PgPool::connect_with(
+					sqlx_database_tester::connect_options(
+						sqlx_database_tester::derive_db_prefix(
+							&sqlx_database_tester::get_database_uri()
+						).expect("Getting database name").as_deref().unwrap_or_default(), #level)
+					).await.expect("connecting to db for creation");
 				#(#database_creators)*
 			});
 
@@ -148,10 +153,11 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 
 			#runtime.block_on(async {
 				#[allow(clippy::expect_used)]
-				let db_pool = sqlx::PgPool::connect(
-					&sqlx_database_tester::get_target_database_uri(
-						&sqlx_database_tester::get_database_uri(), sqlx_database_tester::derive_db_prefix(
-							&sqlx_database_tester::get_database_uri()).expect("Getting database name").as_deref().unwrap_or_default()).expect("URI parsing")
+				let db_pool = sqlx::PgPool::connect_with(
+					sqlx_database_tester::connect_options(
+						sqlx_database_tester::derive_db_prefix(
+							&sqlx_database_tester::get_database_uri()
+						).expect("Getting database name").as_deref().unwrap_or_default(), #level)
 					).await.expect("connecting to db for deletion");
 				#(#database_destructors)*
 			});
