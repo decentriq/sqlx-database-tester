@@ -24,7 +24,10 @@ pub(crate) fn runtime() -> Option<TokenStream> {
 	if cfg!(feature = "runtime-tokio") {
 		Some(quote! {
 			#[allow(clippy::expect_used)]
-			tokio::runtime::Runtime::new().expect("Starting a tokio runtime")
+			tokio::runtime::Builder::new_current_thread()
+				.enable_all()
+				.build()
+				.expect("Starting a tokio runtime")
 		})
 	} else if cfg!(feature = "runtime-actix") {
 		Some(quote! { actix_rt::System::new() })
