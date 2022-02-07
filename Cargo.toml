@@ -1,11 +1,10 @@
 [package]
 name = "sqlx-database-tester"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Kateřina Churanová <crates@churanova.eu>"]
-edition = "2018"
+edition = "2021"
 description = "Library for creation of unit / integration tests with sqlx database support"
 license = "AGPL-3.0"
-resolver = "2"
 
 [features]
 runtime-actix = ["sqlx-database-tester-macros/runtime-actix"]
@@ -16,7 +15,7 @@ sqlx-log = ["log"]
 http = "0.2.4"
 log = { version = "0.4.14", optional = true }
 sqlx = { version = "0.5.5", features = ["runtime-tokio-rustls", "postgres"] }
-sqlx-database-tester-macros = { version = "0.2.0", path = "./sqlx-database-tester-macros" }
+sqlx-database-tester-macros = { version = "0.3.0", path = "./sqlx-database-tester-macros" }
 uuid = { version = "0.8.1", features = ["v4"] }
 dotenv = "0.15.0"
 
