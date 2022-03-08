@@ -7,13 +7,16 @@ description = "Library for creation of unit / integration tests with sqlx databa
 license = "AGPL-3.0"
 
 [features]
+default = ["use-rustls"]
 runtime-actix = ["sqlx-database-tester-macros/runtime-actix"]
 runtime-tokio = ["sqlx-database-tester-macros/runtime-tokio"]
+use-rustls = ["sqlx/runtime-tokio-rustls"]
+use-native-tls = ["sqlx/runtime-tokio-native-tls"]
 sqlx-log = ["log"]
 
 [dependencies]
 log = { version = "0.4.14", optional = true }
-sqlx = { version = "0.6.0", features = ["runtime-tokio-rustls", "postgres"] }
+sqlx = { version = "0.6.0", features = ["postgres"] }
 sqlx-database-tester-macros = { version = "0.5.0", path = "./sqlx-database-tester-macros" }
 uuid = { version = "1.1.2", features = ["v4"] }
 dotenv = "0.15.0"
