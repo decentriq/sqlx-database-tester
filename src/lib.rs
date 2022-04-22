@@ -15,6 +15,7 @@ pub use dotenv;
 use http::uri::Uri;
 pub use sqlx_database_tester_macros::test;
 
+/// Environmental variable containing database URL
 const DATABASE_ENV_VAR: &str = "DATABASE_URL";
 
 #[doc(hidden)]
@@ -42,6 +43,7 @@ pub fn derive_db_name(uri: &str) -> http::Result<String> {
 }
 
 /// Creates a `PgConnectOptions`
+#[must_use]
 pub fn connect_options(
 	database_name: &str,
 	#[allow(unused_variables)] level: &str,
@@ -80,6 +82,7 @@ pub fn get_target_database_uri(uri: &str, db_name: &str) -> http::Result<String>
 }
 
 #[doc(hidden)]
+#[must_use]
 /// Retrieve database_uri from the env variable, panics if it's not available
 pub fn get_database_uri() -> String {
 	env::var(DATABASE_ENV_VAR)

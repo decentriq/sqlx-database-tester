@@ -12,7 +12,7 @@ async fn test_migrations() {
 	let nonexistant_fox = sqlx::query("SELECT * FROM fox").fetch_all(&empty_pool).await;
 	assert!(migrated_fox.is_ok());
 	assert!(default_migrated_bat.is_ok());
-	assert!(!nonexistant_fox.is_ok());
+	assert!(nonexistant_fox.is_err());
 }
 
 #[sqlx_database_tester::test(pool(variable = "pool", transaction_variable = "transaction"))]

@@ -1,3 +1,5 @@
+//! Code generating functions
+
 use std::{iter::Map, slice::Iter};
 
 use proc_macro2::{Ident, TokenStream};
@@ -5,6 +7,7 @@ use quote::{format_ident, quote};
 
 use crate::{MacroArgs, Pool};
 
+/// Destructors for databases
 pub(crate) fn database_destructors(
 	test_attr: &MacroArgs,
 ) -> Map<Iter<Pool>, fn(&Pool) -> TokenStream> {
@@ -20,6 +23,7 @@ pub(crate) fn database_destructors(
 	})
 }
 
+/// Runtime wrapper
 pub(crate) fn runtime() -> Option<TokenStream> {
 	if cfg!(feature = "runtime-tokio") {
 		Some(quote! {
@@ -36,9 +40,12 @@ pub(crate) fn runtime() -> Option<TokenStream> {
 	}
 }
 
+/// Create predictable identifier for database clone variable
 fn pool_variable_clone_ident(name: &Ident) -> Ident {
 	format_ident!("__{}", name)
 }
+
+/// Generate code for closing all databases
 pub(crate) fn database_closers(test_attr: &MacroArgs) -> Map<Iter<Pool>, fn(&Pool) -> TokenStream> {
 	test_attr.pool.iter().map(|Pool { variable, transaction_variable, .. }| {
 		let pool_variable_ident = pool_variable_clone_ident(variable);
@@ -54,6 +61,7 @@ pub(crate) fn database_closers(test_attr: &MacroArgs) -> Map<Iter<Pool>, fn(&Poo
 	})
 }
 
+/// Generate migrators and expose database pool variables
 pub(crate) fn database_migrations_exposures(test_attr: &MacroArgs) -> Vec<TokenStream> {
 	let level = test_attr.level.as_str();
 	let res: Vec<_> = test_attr.pool.iter().map(|pool| {
@@ -76,7 +84,7 @@ pub(crate) fn database_migrations_exposures(test_attr: &MacroArgs) -> Vec<TokenS
 			result.extend(quote! {
 				#[allow(clippy::expect_used)]
 				let mut #transaction_variable = #pool_variable_ident.begin().await.expect("Acquiring transaction");
-			})
+			});
 		}
 		result
 	}).collect();
@@ -84,6 +92,7 @@ pub(crate) fn database_migrations_exposures(test_attr: &MacroArgs) -> Vec<TokenS
 	res
 }
 
+/// Create databases
 pub(crate) fn database_creators(
 	test_attr: &MacroArgs,
 ) -> Map<Iter<Pool>, fn(&Pool) -> TokenStream> {
@@ -98,6 +107,8 @@ pub(crate) fn database_creators(
 	})
 }
 
+/// Create database variables from the `variable` attribute containing randomly
+/// generated database names
 pub(crate) fn database_name_vars(
 	test_attr: &MacroArgs,
 ) -> Map<Iter<Pool>, fn(&Pool) -> TokenStream> {
