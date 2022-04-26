@@ -33,6 +33,7 @@ pub(crate) struct Pool {
 }
 
 impl Pool {
+	/// Return identifier for variable that will contain the database name
 	fn database_name_var(&self) -> Ident {
 		format_ident!("__{}_db_name", &self.variable)
 	}
