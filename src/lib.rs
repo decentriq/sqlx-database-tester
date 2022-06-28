@@ -33,7 +33,7 @@ pub fn derive_db_prefix(uri: &str) -> http::Result<Option<String>> {
 /// Create a UUID based database name with optional prefix from the database
 /// specified in the connection string
 pub fn derive_db_name(uri: &str) -> http::Result<String> {
-	let random_part = uuid::Uuid::new_v4().to_simple().to_string();
+	let random_part = uuid::Uuid::new_v4().simple().to_string();
 
 	Ok(if let Some(prefix) = derive_db_prefix(uri)? {
 		format!("{}_{}", prefix, random_part)
