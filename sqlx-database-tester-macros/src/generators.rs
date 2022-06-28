@@ -14,11 +14,16 @@ pub(crate) fn database_destructors(
 	test_attr.pool.iter().map(|pool| {
 		let database_name = pool.database_name_var();
 		quote! {
-				#[allow(clippy::expect_used)]
-				sqlx::query(&format!(r#"DROP DATABASE "{}""#, #database_name))
-					.execute(&db_pool)
-					.await
-					.expect("Deleting the database");
+			#[allow(clippy::expect_used)]
+			sqlx::query(&format!(r#"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = '{}'"#, #database_name))
+				.execute(&db_pool)
+				.await
+				.expect("Terminate all other connections");
+			#[allow(clippy::expect_used)]
+			sqlx::query(&format!(r#"DROP DATABASE "{}""#, #database_name))
+				.execute(&db_pool)
+				.await
+				.expect("Deleting the database");
 		}
 	})
 }

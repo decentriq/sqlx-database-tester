@@ -22,6 +22,28 @@ async fn test_transaction() -> std::io::Result<()> {
 }
 
 #[sqlx_database_tester::test(pool(variable = "empty_pool", skip_migrations))]
+#[should_panic(expected = "test")]
+#[allow(unreachable_code)]
+async fn test_panic() {
+	panic!("test");
+}
+
+#[sqlx_database_tester::test(pool(variable = "pool"))]
+#[should_panic(expected = "test")]
+#[allow(unreachable_code, clippy::unwrap_used)]
+async fn test_own_transaction_panic() {
+	let _transaction = pool.begin().await.unwrap();
+	panic!("test");
+}
+
+#[sqlx_database_tester::test(pool(variable = "pool", transaction_variable = "_transaction"))]
+#[should_panic(expected = "test")]
+#[allow(unreachable_code)]
+async fn test_transaction_panic() {
+	panic!("test");
+}
+
+#[sqlx_database_tester::test(pool(variable = "empty_pool", skip_migrations))]
 async fn test_case_returning() -> std::io::Result<()> {
 	Ok(())
 }
