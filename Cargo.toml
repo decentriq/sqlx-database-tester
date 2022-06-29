@@ -12,15 +12,14 @@ runtime-tokio = ["sqlx-database-tester-macros/runtime-tokio"]
 sqlx-log = ["log"]
 
 [dependencies]
-http = "0.2.4"
 log = { version = "0.4.14", optional = true }
-sqlx = { version = "0.5.5", features = ["runtime-tokio-rustls", "postgres"] }
+sqlx = { version = "0.6.0", features = ["runtime-tokio-rustls", "postgres"] }
 sqlx-database-tester-macros = { version = "0.3.0", path = "./sqlx-database-tester-macros" }
-uuid = { version = "0.8.1", features = ["v4"] }
+uuid = { version = "1.1.2", features = ["v4"] }
 dotenv = "0.15.0"
 
 [dev-dependencies]
-sqlx = { version = "0.5.5", features = ["runtime-tokio-rustls", "postgres"] }
+sqlx = { version = "0.6.0", features = ["runtime-tokio-rustls", "postgres"] }
 sqlx-database-tester-macros = { path = "./sqlx-database-tester-macros", features = ["runtime-tokio"]}
 tokio = "1.10.0"
 
