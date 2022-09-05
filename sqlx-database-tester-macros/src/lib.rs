@@ -116,21 +116,47 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 	let database_migrations_exposures = generators::database_migrations_exposures(&test_attr);
 	let database_closers = generators::database_closers(&test_attr);
 	let database_destructors = generators::database_destructors(&test_attr);
+	let sleep = generators::sleep();
 
 	(quote! {
 		#[::core::prelude::v1::test]
 		#(#attrs)*
 		#vis #sig {
+			/// Maximum number of tries to attempt database connection
+			const MAX_RETRIES: u8 = 30;
+			/// Time between retries, in seconds
+			const TIME_BETWEEN_RETRIES: u64 = 10;
+
+			#[allow(clippy::expect_used)]
+			async fn connect_with_retry() -> Result<PgPool, sqlx::Error> {
+				let mut i = 0;
+				loop {
+					let db_pool = sqlx::PgPool::connect_with(sqlx_database_tester::connect_options(
+						sqlx_database_tester::derive_db_prefix(&sqlx_database_tester::get_database_uri())
+							.expect("Getting database name")
+							.as_deref()
+							.unwrap_or_default(),
+						#level,
+					))
+					.await;
+					match db_pool {
+						Ok(pool) => break Ok(pool),
+						Err(e) => {
+							if i >= MAX_RETRIES {
+								break Err(e);
+							}
+						}
+					}
+					#sleep(std::time::Duration::from_secs(TIME_BETWEEN_RETRIES)).await;
+					i += 1;
+				}
+			}
+
 			sqlx_database_tester::dotenv::dotenv().ok();
 			#(#database_name_vars)*
 			#runtime.block_on(async {
 				#[allow(clippy::expect_used)]
-				let db_pool = sqlx::PgPool::connect_with(
-					sqlx_database_tester::connect_options(
-						sqlx_database_tester::derive_db_prefix(
-							&sqlx_database_tester::get_database_uri()
-						).expect("Getting database name").as_deref().unwrap_or_default(), #level)
-					).await.expect("connecting to db for creation");
+				let db_pool = connect_with_retry().await.expect("connecting to db for creation");
 				#(#database_creators)*
 			});
 
@@ -145,12 +171,7 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 
 			#runtime.block_on(async {
 				#[allow(clippy::expect_used)]
-				let db_pool = sqlx::PgPool::connect_with(
-					sqlx_database_tester::connect_options(
-						sqlx_database_tester::derive_db_prefix(
-							&sqlx_database_tester::get_database_uri()
-						).expect("Getting database name").as_deref().unwrap_or_default(), #level)
-					).await.expect("connecting to db for deletion");
+				let db_pool = connect_with_retry().await.expect("connecting to db for deletion");
 				#(#database_destructors)*
 			});
 

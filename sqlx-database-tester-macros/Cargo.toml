@@ -1,6 +1,6 @@
 [package]
 name = "sqlx-database-tester-macros"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Kateřina Churanová <crates@churanova.eu>"]
 edition = "2021"
 description = "Macros for sqlx-database-tester"
