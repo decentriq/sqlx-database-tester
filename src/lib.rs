@@ -6,7 +6,6 @@ pub use sqlx_database_tester_macros::test;
 
 /// Environmental variable containing database URL
 const DATABASE_ENV_VAR: &str = "DATABASE_URL";
-
 #[doc(hidden)]
 /// Extract optional prefix from the database specified in the connection string
 pub fn derive_db_prefix(uri: &str) -> Result<Option<String>, sqlx::Error> {
