@@ -128,7 +128,7 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 			const TIME_BETWEEN_RETRIES: u64 = 10;
 
 			#[allow(clippy::expect_used)]
-			async fn connect_with_retry() -> Result<PgPool, sqlx::Error> {
+			async fn connect_with_retry() -> Result<sqlx::PgPool, sqlx::Error> {
 				let mut i = 0;
 				loop {
 					let db_pool = sqlx::PgPool::connect_with(sqlx_database_tester::connect_options(
