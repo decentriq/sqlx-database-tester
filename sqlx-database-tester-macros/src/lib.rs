@@ -53,23 +53,30 @@ pub(crate) struct MacroArgs {
 /// - `skip_migrations`: If present, doesn't run any other_dir_migrations
 /// ```
 /// #[sqlx_database_tester::test(
-///     pool(variable = "default_migrated_pool"),
-///     pool(variable = "migrated_pool", migrations = "./other_dir_migrations"),
-///     pool(variable = "empty_db_pool",
-///          transaction_variable = "empty_db_transaction",
-///          skip_migrations),
+/// 	pool(variable = "default_migrated_pool"),
+/// 	pool(
+/// 		variable = "migrated_pool",
+/// 		migrations = "./other_dir_migrations"
+/// 	),
+/// 	pool(
+/// 		variable = "empty_db_pool",
+/// 		transaction_variable = "empty_db_transaction",
+/// 		skip_migrations
+/// 	)
 /// )]
 /// async fn test_server_sta_rt() {
-///     let migrated_pool_tables = sqlx::query!("SELECT * FROM pg_catalog.pg_tables")
-///         .fetch_all(&migrated_pool)
-///         .await
-///         .unwrap();
-///     let empty_pool_tables = sqlx::query!("SELECT * FROM pg_catalog.pg_tables")
-///         .fetch_all(&migrated_pool)
-///         .await
-///         .unwrap();
-///     println!("Migrated pool tables: \n {:#?}", migrated_pool_tables);
-///     println!("Empty pool tables: \n {:#?}", empty_pool_tables);
+/// 	let migrated_pool_tables =
+/// 		sqlx::query!("SELECT * FROM pg_catalog.pg_tables")
+/// 			.fetch_all(&migrated_pool)
+/// 			.await
+/// 			.unwrap();
+/// 	let empty_pool_tables =
+/// 		sqlx::query!("SELECT * FROM pg_catalog.pg_tables")
+/// 			.fetch_all(&migrated_pool)
+/// 			.await
+/// 			.unwrap();
+/// 	println!("Migrated pool tables: \n {:#?}", migrated_pool_tables);
+/// 	println!("Empty pool tables: \n {:#?}", empty_pool_tables);
 /// }
 /// ```
 #[proc_macro_attribute]
