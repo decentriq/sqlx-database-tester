@@ -96,9 +96,7 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 	let sig = &mut input.sig;
 	let body = &input.block;
 
-	let runtime = if let Some(runtime) = generators::runtime() {
-		runtime
-	} else {
+	let Some(runtime) = generators::runtime() else {
 		return syn::Error::new(
 			Span::call_site(),
 			"One of 'runtime-actix' and 'runtime-tokio' features needs to be enabled",
