@@ -1,10 +1,10 @@
 //! macros for sqlx-database-tester
 
-use darling::FromMeta;
+use darling::{ast::NestedMeta, FromMeta};
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::{format_ident, quote};
-use syn::{parse_macro_input, AttributeArgs, Ident};
+use syn::Ident;
 mod generators;
 
 /// Pool configuration
@@ -81,16 +81,27 @@ pub(crate) struct MacroArgs {
 /// ```
 #[proc_macro_attribute]
 pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
-	let mut input = syn::parse_macro_input!(item as syn::ItemFn);
-	let test_attr_args = parse_macro_input!(test_attr as AttributeArgs);
-	let test_attr: MacroArgs = match MacroArgs::from_list(&test_attr_args) {
+	// Retype to proc-macro2 types
+	let test_attr = proc_macro2::TokenStream::from(test_attr);
+
+	// Darling internal format
+	let nested_meta = match NestedMeta::parse_meta_list(test_attr) {
 		Ok(v) => v,
+		Err(e) => {
+			return TokenStream::from(e.to_compile_error());
+		}
+	};
+
+	let macro_args = match MacroArgs::from_list(&nested_meta) {
+		Ok(args) => args,
 		Err(e) => {
 			return TokenStream::from(e.write_errors());
 		}
 	};
 
-	let level = test_attr.level.as_str();
+	let level = macro_args.level.as_str();
+
+	let mut input = syn::parse_macro_input!(item as syn::ItemFn);
 	let attrs = &input.attrs;
 	let vis = &input.vis;
 	let sig = &mut input.sig;
@@ -116,11 +127,11 @@ pub fn test(test_attr: TokenStream, item: TokenStream) -> TokenStream {
 
 	sig.asyncness = None;
 
-	let database_name_vars = generators::database_name_vars(&test_attr);
-	let database_creators = generators::database_creators(&test_attr);
-	let database_migrations_exposures = generators::database_migrations_exposures(&test_attr);
-	let database_closers = generators::database_closers(&test_attr);
-	let database_destructors = generators::database_destructors(&test_attr);
+	let database_name_vars = generators::database_name_vars(&macro_args);
+	let database_creators = generators::database_creators(&macro_args);
+	let database_migrations_exposures = generators::database_migrations_exposures(&macro_args);
+	let database_closers = generators::database_closers(&macro_args);
+	let database_destructors = generators::database_destructors(&macro_args);
 	let sleep = generators::sleep();
 
 	(quote! {
