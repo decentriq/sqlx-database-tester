@@ -1,6 +1,6 @@
 [package]
 name = "sqlx-database-tester-macros"
-version = "0.4.2"
+version = "0.5.0"
 authors = ["Kateřina Churanová <crates@churanova.eu>"]
 edition = "2021"
 description = "Macros for sqlx-database-tester"
@@ -14,11 +14,13 @@ runtime-actix = []
 runtime-tokio = []
 
 [dependencies]
-quote = "1.0.9"
-syn = { version = "^1", features = ["full"] }
-darling = "0.14.1"
-proc-macro2 = "1.0.28"
+quote = "1.0.26"
+syn = { version = "2.0.15", features = ["full"] }
+darling = "0.20.0"
+proc-macro2 = "1.0.56"
 
 [dev-dependencies]
 sqlx = { version = "0.6.0", features = ["runtime-tokio-rustls", "postgres"] }
-sqlx-database-tester = { version = "0.4.2", path = "..", features = ["runtime-tokio"] }
+sqlx-database-tester = { version = "0.5.0", path = "..", features = [
+    "runtime-tokio",
+] }

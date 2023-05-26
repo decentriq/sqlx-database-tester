@@ -85,10 +85,10 @@ pub(crate) fn database_migrations_exposures(test_attr: &MacroArgs) -> Vec<TokenS
 				sqlx::migrate!(#migrations).run(&#pool_variable_ident).await.expect("Migrating");
 			});
 		}
-	if let Some(transaction_variable) = &pool.transaction_variable {
+		if let Some(transaction_variable) = &pool.transaction_variable {
 			result.extend(quote! {
 				#[allow(clippy::expect_used)]
-		let mut #transaction_variable = #pool_variable_ident.begin().await.expect("Acquiring transaction");
+				let mut #transaction_variable = #pool_variable_ident.begin().await.expect("Acquiring transaction");
 			});
 		}
 		result
