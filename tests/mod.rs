@@ -56,7 +56,7 @@ async fn test_pool_ownership_passed() {
 fn take_pool(_: PgPool) {}
 
 async fn run_transaction_query(transaction: &mut Transaction<'_, Postgres>) {
-	let bat = sqlx::query("SELECT * FROM bat").fetch_all(transaction).await;
+	let bat = sqlx::query("SELECT * FROM bat").fetch_all(&mut **transaction).await;
 	assert!(bat.is_ok());
 }
 
