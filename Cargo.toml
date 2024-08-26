@@ -1,29 +1,29 @@
 [package]
+authors = ["Kateřina Churanová <crates@churanova.eu>"]
+description = "Library for creation of unit / integration tests with sqlx database support"
+edition = "2021"
+license = "AGPL-3.0"
 name = "sqlx-database-tester"
 version = "0.5.0"
-authors = ["Kateřina Churanová <crates@churanova.eu>"]
-edition = "2021"
-description = "Library for creation of unit / integration tests with sqlx database support"
-license = "AGPL-3.0"
 
 [features]
 default = ["use-rustls"]
 runtime-actix = ["sqlx-database-tester-macros/runtime-actix"]
 runtime-tokio = ["sqlx-database-tester-macros/runtime-tokio"]
-use-rustls = ["sqlx/runtime-tokio-rustls"]
-use-native-tls = ["sqlx/runtime-tokio-native-tls"]
 sqlx-log = ["log"]
+use-native-tls = ["sqlx/runtime-tokio-native-tls"]
+use-rustls = ["sqlx/runtime-tokio-rustls"]
 
 [dependencies]
-log = { version = "0.4.14", optional = true }
-sqlx = { version = "0.7", features = ["postgres"] }
-sqlx-database-tester-macros = { version = "0.5.0", path = "./sqlx-database-tester-macros" }
-uuid = { version = "1.1.2", features = ["v4"] }
 dotenv = "0.15.0"
+log = {version = "0.4.14", optional = true}
+sqlx = {version = "0.8", features = ["postgres"]}
+sqlx-database-tester-macros = {version = "0.5.0", path = "./sqlx-database-tester-macros"}
+uuid = {version = "1.1.2", features = ["v4"]}
 
 [dev-dependencies]
-sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres"] }
-sqlx-database-tester-macros = { path = "./sqlx-database-tester-macros", features = ["runtime-tokio"]}
+sqlx = {version = "0.8", features = ["runtime-tokio-rustls", "postgres"]}
+sqlx-database-tester-macros = {path = "./sqlx-database-tester-macros", features = ["runtime-tokio"]}
 tokio = "1.10.0"
 
 [workspace]

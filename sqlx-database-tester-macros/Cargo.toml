@@ -1,10 +1,10 @@
 [package]
+authors = ["Kateřina Churanová <crates@churanova.eu>"]
+description = "Macros for sqlx-database-tester"
+edition = "2021"
+license = "AGPL-3.0"
 name = "sqlx-database-tester-macros"
 version = "0.5.0"
-authors = ["Kateřina Churanová <crates@churanova.eu>"]
-edition = "2021"
-description = "Macros for sqlx-database-tester"
-license = "AGPL-3.0"
 
 [lib]
 proc-macro = true
@@ -13,17 +13,17 @@ proc-macro = true
 default = ["use-rustls"]
 runtime-actix = []
 runtime-tokio = []
-use-rustls = ["sqlx/runtime-tokio-rustls"]
 use-native-tls = ["sqlx/runtime-tokio-native-tls"]
+use-rustls = ["sqlx/runtime-tokio-rustls"]
 
 [dependencies]
-quote = "1.0.26"
-syn = { version = "2.0.15", features = ["full"] }
 darling = "0.20.0"
 proc-macro2 = "1.0.56"
+quote = "1.0.26"
+syn = {version = "2.0.15", features = ["full"]}
 
 [dev-dependencies]
-sqlx = { version = "0.7", features = ["postgres"] }
-sqlx-database-tester = { version = "0.5.0", path = "..", features = [
-    "runtime-tokio",
-] }
+sqlx = {version = "0.8", features = ["postgres"]}
+sqlx-database-tester = {version = "0.5.0", path = "..", features = [
+  "runtime-tokio",
+]}
